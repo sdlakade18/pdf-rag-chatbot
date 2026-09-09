@@ -1,0 +1,23 @@
+# Virtual environment
+venv/
+
+# Environment variables / secrets
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# IDE
+.vscode/
+.idea/
+
+# RAG / vector database
+data/chroma/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
