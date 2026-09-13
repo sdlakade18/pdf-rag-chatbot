@@ -14,7 +14,7 @@ class RAGPipeline:
             model_name="gemini-3.6-flash"
         )
 
-    def ask(self, question: str, top_k: int = 3) -> str:
+    def ask(self, question: str, document_id: str, top_k: int = 3) -> str:
 
         # 1. Convert question into embedding
         query_embedding = self.embedder.embed_text(question)
@@ -22,7 +22,8 @@ class RAGPipeline:
         # 2. Retrieve relevant chunks
         results = self.store.search(
             query_embedding=query_embedding,
-            top_k=top_k
+            top_k=top_k,
+            document_id=document_id
         )
 
         # 3. Build context
@@ -40,3 +41,4 @@ class RAGPipeline:
         "answer": answer,
         "sources": sources
     }
+

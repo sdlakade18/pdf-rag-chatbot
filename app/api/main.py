@@ -22,6 +22,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 class QuestionRequest(BaseModel):
     question: str
+    document_id: str
     
 class Source(BaseModel):
     page_number: int
@@ -38,9 +39,12 @@ def root():
 
 
 @app.post("/ask",response_model=QuestionResponse)
+@app.post("/ask", response_model=QuestionResponse)
 def ask_question(request: QuestionRequest):
-    question = request.question
-    result = rag.ask(question)
+    result = rag.ask(
+        question=request.question,
+        document_id=request.document_id
+    )
     return result
 
 @app.post("/documents/upload")
