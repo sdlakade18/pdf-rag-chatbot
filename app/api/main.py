@@ -151,7 +151,7 @@ def upload_pdf(file: UploadFile = File(...)):
         result = ingest_pdf(
         pdf_path=str(file_path),
         document_id=document_id,
-        embeddder=embedder,
+        embedder=embedder,
         store=store
     )
     except Exception:

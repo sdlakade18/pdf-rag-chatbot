@@ -23,6 +23,12 @@ class RAGPipeline:
             top_k=top_k,
             document_id=document_id
         )
+        
+        if not results["documents"] or not results["documents"][0]:
+            return {
+            "answer": "I don't know based on the provided document.",
+            "sources": []
+    }
 
         # 3. Build context
         context = build_context(results)
