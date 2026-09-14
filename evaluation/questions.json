@@ -1,0 +1,18 @@
+[
+  {
+    "question": "What is a Python function?",
+    "expected_chunk": 6
+  },
+  {
+    "question": "What is a Python list?",
+    "expected_chunk": 4
+  },
+  {
+    "question": "What is a Python dictionary?",
+    "expected_chunk": 5
+  },
+  {
+    "question": "What is Python used for in AI?",
+    "expected_chunk": 8
+  }
+]
