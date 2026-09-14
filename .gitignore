@@ -1,5 +1,6 @@
 # Virtual environment
 venv/
+.venv/
 
 # Environment variables / secrets
 .env
@@ -17,6 +18,9 @@ data/chroma/
 
 # Temporary files
 data/uploads/
+
+# Local Pdfs
+documents/
 
 # Logs
 *.log
