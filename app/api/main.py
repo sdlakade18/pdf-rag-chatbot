@@ -1,13 +1,15 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import (
+    FastAPI,
+    File,
+    UploadFile,
+    HTTPException
+)
+from pydantic import BaseModel,Field,field_validator
 from app.rag.pipeline import RAGPipeline
 from fastapi import File, UploadFile
 from pathlib import Path
 import uuid
 from app.ingestion.ingest import ingest_pdf
-
-
-
 
 app= FastAPI(
     title="PDF RAG Chatbot",
@@ -21,9 +23,25 @@ UPLOAD_DIR = Path("data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 class QuestionRequest(BaseModel):
-    question: str
-    document_id: str
+    question: str = Field(
+        ...,
+        min_length=1,
+        description="Question to ask about the document"
+    )
+
+    document_id: str = Field(
+        ...,
+        min_length=1,
+        description="ID of the uploaded document"
+    )
     
+    @field_validator("question")
+    @classmethod
+    def validate_question(cls, value:str):
+        if not value.strip():
+            raise ValueError("Question cannot be empty")
+        return value.strip()
+
 class Source(BaseModel):
     page_number: int
     chunk_id: int
@@ -38,7 +56,6 @@ def root():
     return {"message": "Welcome to the PDF RAG Chatbot API!"}
 
 
-@app.post("/ask",response_model=QuestionResponse)
 @app.post("/ask", response_model=QuestionResponse)
 def ask_question(request: QuestionRequest):
     result = rag.ask(
@@ -49,7 +66,11 @@ def ask_question(request: QuestionRequest):
 
 @app.post("/documents/upload")
 def upload_pdf(file: UploadFile = File(...)):
-
+    if file.content_type != "application/pdf":
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are supported."
+        )
     document_id = str(uuid.uuid4())
 
     file_path = UPLOAD_DIR / f"{document_id}.pdf"
