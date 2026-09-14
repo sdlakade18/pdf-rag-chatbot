@@ -1,8 +1,9 @@
 import chromadb
-
+from app.core.config import settings
 
 class ChromaStore:
-    def __init__(self, persist_directory: str = "data/chroma"):
+    def __init__(self, persist_directory: str | None = None):
+        persist_directory = persist_directory or settings.CHROMA_PATH
         self.client = chromadb.PersistentClient(
             path=persist_directory
         )
@@ -18,7 +19,7 @@ class ChromaStore:
         embeddings: list[list[float]],
         metadatas: list[dict]
     ):
-        self.collection.add(
+        self.collection.upsert(
             ids=ids,
             documents=texts,
             embeddings=embeddings,

@@ -4,14 +4,10 @@ from app.ingestion.embedder import Embedder
 from app.vectorstore.chroma_store import ChromaStore
 
 
-def ingest_pdf(pdf_path: str,document_id: str):
+def ingest_pdf(pdf_path: str,document_id: str,embeddder: Embedder , store: ChromaStore ):
 
     # 1. Load PDF
     pages = load_pdf(pdf_path)
-
-    # 2. Create components
-    embedder = Embedder()
-    store = ChromaStore()
 
     all_chunks = []
 

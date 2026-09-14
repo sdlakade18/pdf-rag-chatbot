@@ -4,6 +4,7 @@ from fastapi import (
     UploadFile,
     HTTPException
 )
+from app.core.config import settings
 from pydantic import BaseModel,Field,field_validator
 from app.rag.pipeline import RAGPipeline
 from fastapi import File, UploadFile
@@ -24,9 +25,10 @@ app= FastAPI(
 )
 
 rag = RAGPipeline()
+embedder = rag.embedder
+store = rag.store
 
 UPLOAD_DIR = Path("data/uploads")
-MAX_FILE_SIZE = 10*1024*1024  # 10 MB
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 class QuestionRequest(BaseModel):
@@ -109,10 +111,10 @@ def upload_pdf(file: UploadFile = File(...)):
         )
 
     # 4. Validate file size
-    if len(contents) > MAX_FILE_SIZE:
+    if len(contents) > settings.MAX_FILE_SIZE:
         raise HTTPException(
             status_code=413,
-            detail="File size exceeds the 10 MB limit."
+            detail=f"File size exceeds the {settings.MAX_FILE_SIZE_MB} MB limit."
         )
 
     # 5. Validate PDF signature
@@ -148,7 +150,9 @@ def upload_pdf(file: UploadFile = File(...)):
     try:
         result = ingest_pdf(
         pdf_path=str(file_path),
-        document_id=document_id
+        document_id=document_id,
+        embeddder=embedder,
+        store=store
     )
     except Exception:
         logger.exception(

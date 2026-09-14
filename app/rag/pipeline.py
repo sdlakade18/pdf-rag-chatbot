@@ -10,9 +10,7 @@ class RAGPipeline:
         self.embedder = Embedder()
         self.store = ChromaStore()
 
-        self.llm = GeminiLLM(
-            model_name="gemini-3.6-flash"
-        )
+        self.llm = GeminiLLM()
 
     def ask(self, question: str, document_id: str, top_k: int = 3) -> str:
 
