@@ -10,7 +10,12 @@ from fastapi import File, UploadFile
 from pathlib import Path
 import uuid
 from app.ingestion.ingest import ingest_pdf
-import fitz
+import fitz, logging
+from app.core.logging_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
+
 
 app= FastAPI(
     title="PDF RAG Chatbot",
@@ -60,10 +65,28 @@ def root():
 
 @app.post("/ask", response_model=QuestionResponse)
 def ask_question(request: QuestionRequest):
-    result = rag.ask(
-        question=request.question,
-        document_id=request.document_id
+
+    logger.info(
+        "Question received: document_id=%s",
+        request.document_id
     )
+
+    try:
+        result = rag.ask(
+            question=request.question,
+            document_id=request.document_id
+        )
+    except Exception:
+        logger.exception(
+            "RAG question failed: document_id=%s",
+            request.document_id
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate an answer."
+        )
+
     return result
 
 @app.post("/documents/upload")
@@ -110,16 +133,40 @@ def upload_pdf(file: UploadFile = File(...)):
         )
     
     document_id = str(uuid.uuid4())
+    
+    logger.info(
+    "Processing PDF: document_id=%s filename=%s",
+    document_id,
+    file.filename
+)
 
     file_path = UPLOAD_DIR / f"{document_id}.pdf"
 
     with open(file_path, "wb") as buffer:
         buffer.write(contents)
         
-    result = ingest_pdf(
-        pdf_path=str(file_path), 
+    try:
+        result = ingest_pdf(
+        pdf_path=str(file_path),
         document_id=document_id
-        )
+    )
+    except Exception:
+        logger.exception(
+        "PDF ingestion failed: document_id=%s filename=%s",
+        document_id,
+        file.filename
+    )
+        if file_path.exists():
+            file_path.unlink()  # Remove the uploaded file if ingestion fails
+            logger.info(
+                "Removed uploaded file due to ingestion failure: %s",
+                document_id
+            )
+
+        raise HTTPException(
+        status_code=500,
+        detail="Failed to process the PDF."
+    )
     
 
     return {
