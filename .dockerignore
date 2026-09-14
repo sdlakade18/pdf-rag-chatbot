@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+.env
+
+.git/
+.gitignore
+
+data/chroma/
+data/uploads/
+
+documents/
+
+.pytest_cache/
+*.log
