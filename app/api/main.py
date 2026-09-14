@@ -10,6 +10,7 @@ from fastapi import File, UploadFile
 from pathlib import Path
 import uuid
 from app.ingestion.ingest import ingest_pdf
+import fitz
 
 app= FastAPI(
     title="PDF RAG Chatbot",
@@ -20,6 +21,7 @@ app= FastAPI(
 rag = RAGPipeline()
 
 UPLOAD_DIR = Path("data/uploads")
+MAX_FILE_SIZE = 10*1024*1024  # 10 MB
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 class QuestionRequest(BaseModel):
@@ -66,17 +68,53 @@ def ask_question(request: QuestionRequest):
 
 @app.post("/documents/upload")
 def upload_pdf(file: UploadFile = File(...)):
-    if file.content_type != "application/pdf":
+     # 1. Validate filename
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are supported."
         )
+
+    # 2. Read file contents
+    contents = file.file.read()
+
+    # 3. Reject empty files
+    if not contents:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is empty."
+        )
+
+    # 4. Validate file size
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="File size exceeds the 10 MB limit."
+        )
+
+    # 5. Validate PDF signature
+    if not contents.startswith(b"%PDF"):
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is not a valid PDF."
+        )
+
+    # 6. Validate that PyMuPDF can actually open it
+    try:
+        document = fitz.open(stream=contents, filetype="pdf")
+        document.close()
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded PDF could not be opened."
+        )
+    
     document_id = str(uuid.uuid4())
 
     file_path = UPLOAD_DIR / f"{document_id}.pdf"
 
     with open(file_path, "wb") as buffer:
-        buffer.write(file.file.read())
+        buffer.write(contents)
         
     result = ingest_pdf(
         pdf_path=str(file_path), 
