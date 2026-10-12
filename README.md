@@ -85,7 +85,30 @@ Instead of sending an entire PDF directly to an LLM, the application:
                                                      ▼
                                                 Streamlit
 ```
+## Architecture
 
+The project uses a Retrieval-Augmented Generation (RAG) pipeline to answer questions from uploaded PDF documents.
+
+### AWS Workflow
+
+1. **Amazon S3:** Stores uploaded PDF documents.
+2. **AWS Lambda:** Triggered when a new PDF is uploaded to the configured S3 bucket.
+3. **FastAPI on Amazon EC2:** Receives the PDF from Lambda through an internal API endpoint.
+4. **PyMuPDF:** Extracts text from the PDF.
+5. **ChromaDB:** Stores document chunks and their vector embeddings for semantic retrieval.
+6. **Gemini API:** Generates answers using the retrieved document context.
+7. **Amazon CloudWatch:** Collects application and Lambda logs for troubleshooting.
+
+### Technology Stack
+
+- **Backend:** Python, FastAPI
+- **Document processing:** PyMuPDF
+- **Vector database:** ChromaDB
+- **Embeddings:** Sentence Transformers
+- **LLM:** Google Gemini API
+- **Containerization:** Docker
+- **Cloud infrastructure:** Amazon EC2, Amazon S3, AWS Lambda, Amazon ECR
+- **Monitoring:** Amazon CloudWatch
 ## 🧰 Tech Stack
 
 | Technology | Purpose |
