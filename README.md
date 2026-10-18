@@ -384,6 +384,35 @@ Use the question-answering endpoint exposed in Swagger UI to submit a question a
 
 The PDF should be ingested successfully, and questions about its content should receive answers grounded in the retrieved document context.
 
+## Limitations and Cost Management
+
+### Current Limitations
+
+- The API should remain restricted to authorized clients.
+- The quality of generated answers depends on PDF text extraction, chunking, retrieval relevance, and the language model.
+- Scanned PDFs may require OCR if they do not contain extractable text.
+- ChromaDB persistence and document storage must be managed carefully to preserve ingested data.
+- Production use requires additional hardening, including authentication, HTTPS, and appropriate request limits.
+
+### AWS Cost Management
+
+The project uses AWS services that may incur charges depending on resource configuration and usage.
+
+- **Amazon EC2:** Stop the instance when the backend is not needed. Attached EBS volumes may continue to incur charges.
+- **Amazon ECR:** Review stored container images and remove only images that are no longer required.
+- **Amazon S3:** Monitor document storage and request usage.
+- **Amazon CloudWatch:** Review log ingestion and retention settings.
+- **AWS Lambda:** Monitor invocation counts and execution duration.
+
+Review the AWS Billing and Cost Management dashboard regularly. Stopping EC2 does not eliminate all possible AWS charges.
+
+### Future Improvements
+
+- Add authentication and HTTPS.
+- Implement automated testing and CI/CD.
+- Add OCR support for scanned PDFs.
+- Improve retrieval evaluation and answer-quality monitoring.
+- Define suitable CloudWatch log retention policies.
 
 
 ## 🧠 Key Design Decisions
