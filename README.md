@@ -335,6 +335,8 @@ What is a Python function?
 
 The system retrieves relevant chunks and generates a grounded answer while showing the source page/chunk references.
 
+**Dependency setup:** This project includes AWS-specific dependency configuration in `requirements-aws.txt` and `Dockerfile.aws`. The standard `Dockerfile` references `requirements.txt`, which must be present before using that build configuration. Verify the appropriate dependency file and Dockerfile before building an image.
+
 ## AWS Deployment Workflow
 
 The application uses an event-driven workflow to process PDF documents stored in Amazon S3.
