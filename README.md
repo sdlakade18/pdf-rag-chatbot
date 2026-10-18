@@ -335,6 +335,27 @@ What is a Python function?
 
 The system retrieves relevant chunks and generates a grounded answer while showing the source page/chunk references.
 
+## AWS Deployment Workflow
+
+The application uses an event-driven workflow to process PDF documents stored in Amazon S3.
+
+1. **Upload:** A PDF is uploaded to the configured S3 bucket.
+2. **Trigger:** An S3 object-created event invokes the `pdf-rag-s3-processor` Lambda function for matching PDF files.
+3. **Download:** Lambda retrieves the PDF from S3.
+4. **API request:** Lambda sends the PDF as a multipart upload to the FastAPI backend running on Amazon EC2.
+5. **Ingestion:** The backend extracts document text, creates chunks and embeddings, and stores them in ChromaDB.
+6. **Question answering:** Users submit questions to the RAG API, which retrieves relevant document context and uses the Gemini API to generate an answer.
+7. **Monitoring:** Amazon CloudWatch collects application and Lambda logs for troubleshooting.
+
+### Security Controls
+
+- Restrict inbound EC2 access to trusted IP addresses and the Lambda security group.
+- Use an IAM policy scoped to the project S3 bucket for Lambda access.
+- Keep API keys and credentials out of source control.
+- Review AWS billing and stop unused compute resources when appropriate.
+
+
+
 ## 🧠 Key Design Decisions
 
 ### Why RAG?
