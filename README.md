@@ -292,7 +292,7 @@ source venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+> **Dependency setup:** The local Python installation instructions are being finalized. The Docker build currently expects a root-level `requirements.txt`; verify that this file is present before building the image.
 ```
 
 ### 4. Configure Gemini
