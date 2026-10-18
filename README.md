@@ -354,6 +354,36 @@ The application uses an event-driven workflow to process PDF documents stored in
 - Keep API keys and credentials out of source control.
 - Review AWS billing and stop unused compute resources when appropriate.
 
+## Testing the API
+
+### 1. Open API Documentation
+
+When the backend is running and reachable, open:
+
+```text
+http://localhost:8000/docs
+```
+
+For a deployed instance, use the configured API host instead of `localhost`.
+
+### 2. Upload a PDF
+
+In Swagger UI:
+
+1. Find `POST /documents/upload`.
+2. Select **Try it out**.
+3. Choose a PDF file in the `file` field.
+4. Click **Execute**.
+5. Verify that the request succeeds.
+
+### 3. Test Question Answering
+
+Use the question-answering endpoint exposed in Swagger UI to submit a question about the uploaded document. Verify that the response is relevant to the PDF content.
+
+### Expected Result
+
+The PDF should be ingested successfully, and questions about its content should receive answers grounded in the retrieved document context.
+
 
 
 ## 🧠 Key Design Decisions
